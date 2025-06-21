@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { useAuth } from '../auth/LoginComponent';
 
 // Función para convertir gs:// a URL de Google Cloud Storage
 const convertGsToCloudUrl = (gsPath) => {
@@ -13,11 +14,13 @@ const convertGsToCloudUrl = (gsPath) => {
   
   // Convertir gs://buckets_llamadas/... a https://storage.cloud.google.com/buckets_llamadas/...
   const cloudUrl = gsPath.replace('gs://', 'https://storage.cloud.google.com/');
+  
   console.log('🔗 URL convertida:', gsPath, '→', cloudUrl);
   return cloudUrl;
 };
 
 export function AudioPlayer({ selectedCall, onClose }) {
+  const { getSignedUrl } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -29,25 +32,33 @@ export function AudioPlayer({ selectedCall, onClose }) {
 
   // Convertir gs:// a URL directa cuando cambia la llamada seleccionada
   useEffect(() => {
-    if (!selectedCall?.ID_AUDIO) {
-      setAudioUrl(null);
+    const fetchAudioUrl = async () => {
+      if (!selectedCall?.ID_AUDIO) {
+        setAudioUrl(null);
+        setError(null);
+        return;
+      }
+
+      console.log('🎵 AudioPlayer: Procesando nueva llamada:', selectedCall.ID_AUDIO);
+      
+      try {
+      // Extraer path del audio
+      const audioPath = selectedCall.ID_AUDIO.replace('gs://buckets_llamadas/', '');
+      const streamUrl = `https://quality-dashboard-api-919351372784.europe-west1.run.app/api/audio/stream/${audioPath}`;
+      
+      setAudioUrl(streamUrl);
       setError(null);
-      return;
+      console.log('✅ URL de streaming configurada:', streamUrl);
+    } catch (err) {
+      console.error('❌ Error configurando stream:', err);
+      setError('Error configurando reproductor: ' + err.message);
+      setAudioUrl(null);
+    }
     }
 
-    console.log('🎵 AudioPlayer: Procesando nueva llamada:', selectedCall.ID_AUDIO);
-    
-    const cloudUrl = convertGsToCloudUrl(selectedCall.ID_AUDIO);
-    
-    if (cloudUrl) {
-      setAudioUrl(cloudUrl);
-      setError(null);
-      console.log('✅ URL configurada:', cloudUrl);
-    } else {
-      setError('URL de audio no válida');
-      setAudioUrl(null);
-    }
-  }, [selectedCall]);
+    fetchAudioUrl();
+  }, [selectedCall, getSignedUrl]);
+
 
   useEffect(() => {
     const audio = audioRef.current;
