@@ -2,8 +2,8 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
 
 // 🔗 Configuración del backend (cambia aquí cuando quieras nueva URL)
-const BACKEND_URL = 'https://dashboard-backend-919351372784.europe-west1.run.app';
-// const BACKEND_URL = 'https://quality-dashboard-api-919351372784.europe-west1.run.app'; // Nueva URL para más tarde
+const BACKEND_URL = 'https://quality-dashboard-api-919351372784.europe-west1.run.app';
+
 
 console.log('🔗 Backend URL configurada:', BACKEND_URL);
 
