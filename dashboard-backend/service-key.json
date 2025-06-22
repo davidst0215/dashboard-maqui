@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "vernal-dispatch-457615-n9",
+  "private_key_id": "key_id",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCyzF099sHizbD3\nT9ywEI4ZpslPQPC3OQhYsQ5UhVJSasb2qs49U2jWdG7lLtxvbSLLmAxtF5OvLiXn\n75Rf1yw0J1A7BzOdGpbM4tHPu115W2zcHMo3mSl12pwOxEKsZlILZtkCcRjCCeSt\nLmEIEWH2mJhpGtwEJ2dSHPglgxCdsxXIWeKy9jdN1mHlDZFJQLbdjCtIIjj7e3C6\nkmiCmPs2sTU0pgUZXu6sQi3XHBb49YRQx6XuenF/AVdDnNKjJJHmyjhr2bjq48d4\niC/9NswW9RULWuH01GyBWR+QvjKmFmQP51hWr7CuzuqwS4/NPm0hNam+vT9zSBcz\nXiw/VwuRAgMBAAECggEAGxWRBEtmSFx/M59h3zvKwsD8mqhMLn0Rshm0AYKmmzx4\ngjIShsClT2MYz1e/ZZOjIzMXosjhArbbYBxvHeuC0y2nXiGzpFc8Q7ISNUT9Hl6G\niXtE+JIXcTZZ0HTTYrknMXn1YoTOSspj3QX7BdVYQRoRcE50yJ5NbOddgZUuhayz\nP52KI+qZamxFiW0gaw8vvO10+JLNe/WfgMfu8Fjoi5gMneSeDAe/ip5g01I2VAr6\n19IUI1bUyx7HUt2F866hHVLpwr0xVR6zacR63plqnZeDiw1z7TDr0ZSVMZkMdNPm\nfO2pyEKVTx7UFIHoU3EQGN+rD+yFPfgNdE7lsg2FrwKBgQDzyPXsV7GajzqIYQDN\n3ThlPVps8dNTlvv6RWDJ3ofIlAv00yake6nLkT5ZUVMmsdSS7iCk/ZPbC5X+tH14\ndNC6a/MUVNtSWYG8nC9AVHskpkS81zH1pbqgKDUxvAEZSLkwDkroTMi/njNhb/qT\nvMTEKY/LIEXZa32Ad7sbuDHR1wKBgQC7wdESv8Q5LjkI/AhHy2chO8z4f7O8BgZN\nvh74VWUmZjy0qyo0YzpgYPbSdFoaNrhhNzQPNAz+c24ryglmPnSE317AnNrj4mrp\ni3gpH5CY4hwDtgk0poxbRbmuAO5m/+CNwyAZtLfni1L6t9OJDvToZFvgJqUqhv2m\nIaDSLSSw1wKBgGvtLiLB+BjrDAjQmSCKrar0bJIKxXoeP9Pe3yi/4fFEyb5LtLHh\nJZy/4pB8Voms9OVPkxg4QzsYeAFZOqsXXEkL/YOkxaxBgBRWOP0L6bCiA5Bu3OlZ\nw7Of2Vz5VKsy7Pl/el45kC51BV4/yvmY+qu1krlkwketNNSpLSbqdvPlAoGBAJh1\naS+wR8WmoumIvbCOmc+Cn42pJGko+zVljABaVyg3HFQYKM0hReW81q9Ni1x90noe\nOUefHG4BjRRBmiBL1pGOT4JX2+XvlKDPf2LlHqUF9XmN9yupkY8Lrxp75xn77Hsw\nVoCJHkwF9ftgCYThgDy0QWZh+vvtYUnlRJFl1sVBAoGAYvo7fpAtnVqgqDgEfacW\n5pOFKaigtx9ESJOM1JFy9ehk9DX6en08geQjS6rTgjzSLWvvuKJO4KxFNAmgLbt8\nItuC7Z/84TZCman8CJcaXlH8nBU2WCnXYJpzqL6J7EzzJcIwa9eWKayBikqF9x8F\nd5ZkrCdXCSPAK9fBvx0teD0=\n-----END PRIVATE KEY-----",
+  "client_email": "dashboard-backend-service@vernal-dispatch-457615-n9.iam.gserviceaccount.com",
+  "client_id": "client_id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dashboard-backend-service%40vernal-dispatch-457615-n9.iam.gserviceaccount.com"
+}
