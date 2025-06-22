@@ -42,29 +42,28 @@ export function AudioPlayer({ selectedCall, onClose }) {
       console.log('🎵 AudioPlayer: Procesando nueva llamada:', selectedCall.ID_AUDIO);
       
       try {
-      // Extraer path del audio
-      const audioPath = selectedCall.ID_AUDIO.replace('gs://buckets_llamadas/', '');
-      const streamUrl = `https://quality-dashboard-api-919351372784.europe-west1.run.app/api/audio/stream/${audioPath}`;
-      
-      setAudioUrl(streamUrl);
-      setError(null);
-      console.log('✅ URL de streaming configurada:', streamUrl);
-    } catch (err) {
-      console.error('❌ Error configurando stream:', err);
-      setError('Error configurando reproductor: ' + err.message);
-      setAudioUrl(null);
-    }
+        // Extraer path del audio
+        const audioPath = selectedCall.ID_AUDIO.replace('gs://buckets_llamadas/', '');
+        const streamUrl = `https://quality-dashboard-api-919351372784.europe-west1.run.app/api/audio/stream/${audioPath}`;
+        
+        setAudioUrl(streamUrl);
+        setError(null);
+        console.log('✅ URL de streaming MP3 configurada:', streamUrl);
+      } catch (err) {
+        console.error('❌ Error configurando stream:', err);
+        setError('Error configurando reproductor: ' + err.message);
+        setAudioUrl(null);
+      }
     }
 
     fetchAudioUrl();
   }, [selectedCall, getSignedUrl]);
 
-
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !audioUrl) return;
 
-    console.log('🎵 Configurando audio con URL:', audioUrl);
+    console.log('🎵 Configurando audio MP3 con URL:', audioUrl);
     
     setError(null);
     setIsLoading(true);
@@ -80,12 +79,12 @@ export function AudioPlayer({ selectedCall, onClose }) {
     };
     
     const handleLoadStart = () => {
-      console.log('📡 Iniciando carga del audio');
+      console.log('📡 Iniciando carga del audio MP3');
       setIsLoading(true);
     };
     
     const handleCanPlay = () => {
-      console.log('✅ Audio listo para reproducir');
+      console.log('✅ Audio MP3 listo para reproducir');
       setIsLoading(false);
     };
     
@@ -113,10 +112,10 @@ export function AudioPlayer({ selectedCall, onClose }) {
             errorMessage = 'Error de red - Verifica tu conexión';
             break;
           case 3:
-            errorMessage = 'Error de decodificación - El formato WAV no es compatible con tu navegador';
+            errorMessage = 'Error de decodificación - Problema con el formato de audio';
             break;
           case 4:
-            errorMessage = 'Formato de audio no soportado - Intenta descargar y reproducir localmente';
+            errorMessage = 'Formato de audio no soportado - Contacta al administrador';
             break;
           default:
             errorMessage = `Error ${audio.error.code}: ${audio.error.message}`;
@@ -160,7 +159,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
         audioRef.current.pause();
         setIsPlaying(false);
       } else {
-        console.log('▶️ Reproduciendo audio');
+        console.log('▶️ Reproduciendo audio MP3');
         await audioRef.current.play();
         setIsPlaying(true);
       }
@@ -218,7 +217,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
     if (audioUrl) {
       const link = document.createElement('a');
       link.href = audioUrl;
-      link.download = `${selectedCall.ID_LLAMADA}.wav`;
+      link.download = `${selectedCall.ID_LLAMADA}.mp3`; // ✅ Cambió a MP3
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -239,7 +238,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
-          <span>Reproductor de Audio</span>
+          <span>Reproductor de Audio MP3</span>
           {onClose && (
             <Button variant="ghost" size="sm" onClick={onClose}>
               ✕
@@ -248,16 +247,16 @@ export function AudioPlayer({ selectedCall, onClose }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Audio element con mejor compatibilidad */}
+        {/* Audio element con mejor compatibilidad para MP3 */}
         {audioUrl && (
           <audio 
             ref={audioRef} 
             preload="metadata"
-            crossOrigin="use-credentials"
             controls={false}
           >
-            <source src={audioUrl} type="audio/wav" />
             <source src={audioUrl} type="audio/mpeg" />
+            <source src={audioUrl} type="audio/mp3" />
+            <source src={audioUrl} type="audio/wav" />
             <source src={audioUrl} type="audio/ogg" />
             Tu navegador no soporta la reproducción de audio.
           </audio>
@@ -266,7 +265,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
         {/* Estados de carga y error */}
         {isLoading && (
           <div className="text-center text-sm text-blue-500">
-            📡 Cargando audio desde Google Cloud Storage...
+            📡 Convirtiendo y cargando audio desde Google Cloud Storage...
           </div>
         )}
         
@@ -274,7 +273,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
           <div className="text-center text-sm text-red-500 bg-red-50 p-3 rounded">
             <div className="font-semibold mb-2">❌ {error}</div>
             <div className="text-xs mb-3">
-              💡 Asegúrate de estar logueado en Google con: <strong>david@sayainvestments.co</strong>
+              💡 El audio se está convirtiendo de WAV a MP3 para mejor compatibilidad
             </div>
             <div className="mt-2 space-x-2">
               {audioUrl && (
@@ -292,7 +291,7 @@ export function AudioPlayer({ selectedCall, onClose }) {
                     onClick={downloadAudio}
                     className="bg-green-50 hover:bg-green-100"
                   >
-                    📥 Descargar audio
+                    📥 Descargar MP3
                   </Button>
                   <Button 
                     variant="outline" 
@@ -333,12 +332,15 @@ export function AudioPlayer({ selectedCall, onClose }) {
                 error ? 'text-red-600' :
                 audioUrl ? 'text-green-600' : 'text-gray-600'
               }`}>
-                {isLoading ? 'Cargando...' : error ? 'Error' : audioUrl ? 'Listo' : 'Configurando...'}
+                {isLoading ? 'Convirtiendo a MP3...' : error ? 'Error' : audioUrl ? 'MP3 Listo' : 'Configurando...'}
               </span>
             </div>
           </div>
           <div className="mt-2 pt-2 border-t">
             <div><strong>Duración:</strong> {formatTime(duration)}</div>
+            <div><strong>Formato:</strong> 
+              <span className="text-green-600 ml-1">🎵 MP3 (Convertido desde WAV)</span>
+            </div>
             {audioUrl && (
               <div><strong>Acceso:</strong> 
                 <span className="text-green-600 ml-1">✅ Autorizado</span>
