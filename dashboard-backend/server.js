@@ -4,9 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Storage } = require('@google-cloud/storage');
+const { BigQuery } = require('@google-cloud/bigquery');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3009;
 
 // Configuración
 const JWT_SECRET = process.env.JWT_SECRET || 'tu-clave-super-secreta-cambiar-en-produccion';
@@ -43,10 +44,36 @@ try {
   console.error('❌ Error inicializando Google Cloud Storage:', error);
 }
 
+// Inicializar BigQuery
+let bigquery;
+try {
+  if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+    bigquery = new BigQuery({
+      projectId: 'peak-emitter-350713',
+      credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      },
+    });
+    console.log('✅ BigQuery inicializado con variables de entorno');
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    bigquery = new BigQuery({
+      projectId: 'peak-emitter-350713',
+      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    });
+    console.log('✅ BigQuery inicializado con archivo de credenciales');
+  } else {
+    bigquery = new BigQuery({ projectId: 'peak-emitter-350713' });
+    console.log('✅ BigQuery inicializado con autenticación automática');
+  }
+} catch (error) {
+  console.error('❌ Error inicializando BigQuery:', error);
+}
+
 // Base de datos de usuarios (temporal)
 const USUARIOS = {
   'admin@sayainvestments.co': { 
-    password: 'password123', 
+    password: 'admin123', 
     role: 'admin',
     name: 'Administrador' 
   },
@@ -69,14 +96,7 @@ const USUARIOS = {
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000', 
-    'https://dashboard-maqui.vercel.app',
-    'https://dashboard-maqui-david-sayainvestmes-projects.vercel.app',
-  
-    'https://*.vercel.app'
-  ],
+  origin: true,  // Permitir cualquier origen temporalmente
   credentials: true
 }));
 
@@ -112,8 +132,21 @@ app.use(express.static('.', {
     if (path.endsWith('.xlsx')) {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
-  }
+  },
+  // Excluir archivos .xlsx para que los maneje el endpoint específico
+  dotfiles: 'ignore',
+  index: false,
+  // Filtro para excluir .xlsx
+  extensions: false
 }));
+
+// Agregar middleware para excluir .xlsx
+app.use((req, res, next) => {
+  if (req.path.endsWith('.xlsx')) {
+    return next();
+  }
+  express.static('.')(req, res, next);
+});
 
 // Endpoint específico para el Excel (alternativa)
 app.get('/data.xlsx', async (req, res) => {
@@ -361,6 +394,116 @@ app.get('/api/audio/stream/*', async (req, res) => {
     if (!res.headersSent) {
       res.status(500).json({ error: 'Error interno: ' + error.message });
     }
+  }
+});
+
+// ========== ENDPOINTS DE DASHBOARD ==========
+
+// Endpoint para obtener datos del dashboard desde BigQuery
+app.get('/api/dashboard/data', verifyToken, async (req, res) => {
+  try {
+    console.log('📊 Cargando datos del dashboard desde BigQuery para usuario:', req.user.email);
+
+    if (!bigquery) {
+      return res.status(500).json({
+        success: false,
+        error: 'BigQuery no inicializado'
+      });
+    }
+
+    // Query mejorado con datos de Validacion_Ventas
+    const query = `
+      SELECT
+        a.dni,
+        a.categoria,
+        a.conformidad,
+        a.puntuacion_total,
+        a.puntuacion_identificacion,
+        a.puntuacion_verificacion,
+        a.puntuacion_contextualizacion,
+        a.puntuacion_consulta_dudas,
+        a.puntuacion_sentimientos,
+        a.comentarios,
+        a.fecha_llamada,
+        t.audio_url,
+
+        -- Datos enriquecidos de Validacion_Ventas
+        v.Nombre,
+        v.Gestor,
+        v.Vendedor,
+        v.Supervisor,
+        v.ResultadoVal1,
+        v.ResultadoVal2,
+        v.MontoCancelado,
+        DATE(v.FechaHoraConfirmacion) as fecha_validacion
+
+      FROM \`peak-emitter-350713.Calidad_Llamadas.analisis_calidad\` a
+      LEFT JOIN \`peak-emitter-350713.Calidad_Llamadas.transcripciones\` t
+        ON a.dni = t.dni AND DATE(a.fecha_llamada) = DATE(t.fecha_llamada)
+      LEFT JOIN \`peak-emitter-350713.FR_Admision.Validacion_Ventas\` v
+        ON LTRIM(v.NumeroDocumento, "0") = a.dni
+      WHERE DATE(a.fecha_llamada) >= '2025-09-01'
+        AND DATE(a.fecha_llamada) <= '2025-09-30'
+      ORDER BY a.fecha_llamada DESC
+    `;
+
+    console.log('🔍 Ejecutando query BigQuery...');
+    const [rows] = await bigquery.query({ query });
+
+    console.log(`✅ BigQuery respondió con ${rows.length} filas`);
+
+    if (rows.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        message: 'No se encontraron datos para el período consultado'
+      });
+    }
+
+    // Procesar datos para el frontend
+    const processedData = rows.map(row => ({
+      dni: row.dni,
+      categoria: row.categoria,
+      conformidad: row.conformidad,
+      puntuacion_total: row.puntuacion_total,
+      puntuacion_identificacion: row.puntuacion_identificacion,
+      puntuacion_verificacion: row.puntuacion_verificacion,
+      puntuacion_contextualizacion: row.puntuacion_contextualizacion,
+      puntuacion_consulta_dudas: row.puntuacion_consulta_dudas,
+      puntuacion_sentimientos: row.puntuacion_sentimientos,
+      comentarios: row.comentarios,
+      fecha_llamada: row.fecha_llamada,
+      audio_url: row.audio_url,
+
+      // Datos enriquecidos
+      Nombre: row.Nombre || 'No disponible',
+      Gestor: row.Gestor || 'No asignado',
+      Vendedor: row.Vendedor || 'No asignado',
+      Supervisor: row.Supervisor || 'No asignado',
+      ResultadoVal1: row.ResultadoVal1 || 'Sin validación',
+      ResultadoVal2: row.ResultadoVal2 || 'Sin validación',
+      MontoCancelado: row.MontoCancelado || 0,
+      fecha_validacion: row.fecha_validacion
+    }));
+
+    console.log('✅ Datos procesados exitosamente');
+    console.log(`📋 Primer registro de ejemplo:`, processedData[0]);
+
+    res.json({
+      success: true,
+      data: processedData,
+      total_records: processedData.length,
+      query_time: new Date().toISOString(),
+      user: req.user.email
+    });
+
+  } catch (error) {
+    console.error('❌ Error cargando datos del dashboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error cargando datos del dashboard',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

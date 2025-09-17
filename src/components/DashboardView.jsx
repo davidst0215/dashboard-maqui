@@ -31,26 +31,70 @@ function DashboardView() {
   
   const fetchData = async () => {
   try {
-    console.log('🔍 Iniciando carga de Excel...');
-    const response = await fetch(`${BACKEND_URL}/data.xlsx`); // <-- CAMBIO AQUÍ
+    console.log('🔍 Iniciando carga desde BigQuery API...');
+
+    // Obtener token de autenticación
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ No hay token de autenticación');
+      setLoading(false);
+      return;
+    }
+
+    const response = await fetch(`${BACKEND_URL}/api/dashboard/data`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
     console.log('📊 Response status:', response.status);
-    
-    const arrayBuffer = await response.arrayBuffer();
-    console.log('📦 ArrayBuffer size:', arrayBuffer.byteLength);
-    
-    const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
-    console.log('📋 Workbook sheets:', workbook.SheetNames);
-    
-    const worksheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[worksheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
-    
-    console.log('✅ Datos cargados:', jsonData.length, 'filas');
-    console.log('🔍 Primera fila:', jsonData[0]);
-    
-    setAllData(jsonData);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Respuesta API:', result);
+
+    if (result.success && result.data) {
+      console.log('✅ Datos BigQuery cargados:', result.data.length, 'filas');
+      console.log('🔍 Primera fila:', result.data[0]);
+
+      // Convertir formato BigQuery a formato esperado por el frontend
+      const formattedData = result.data.map(item => ({
+        DNI: item.dni,
+        CATEGORÍA: item.categoria,
+        CONFORMIDAD: item.conformidad,
+        PUNTUACIÓN_TOTAL: item.puntuacion_total,
+        PUNTUACIÓN_IDENTIFICACIÓN: item.puntuacion_identificacion,
+        PUNTUACIÓN_VERIFICACIÓN: item.puntuacion_verificacion,
+        PUNTUACIÓN_CONTEXTUALIZACIÓN: item.puntuacion_contextualizacion,
+        PUNTUACIÓN_CONSULTA_DUDAS: item.puntuacion_consulta_dudas,
+        PUNTUACIÓN_SENTIMIENTOS: item.puntuacion_sentimientos,
+
+        // Datos enriquecidos de Validacion_Ventas
+        NOMBRE: item.Nombre || 'No disponible',
+        SUBGERENTE: item.Gestor || 'No asignado',
+        SUPERVISOR: item.Supervisor || 'No asignado',
+        VENDEDOR: item.Vendedor || 'No asignado',
+        RESULTADO_VAL1: item.ResultadoVal1 || 'Sin validación',
+        RESULTADO_VAL2: item.ResultadoVal2 || 'Sin validación',
+        MONTO_CANCELADO: item.MontoCancelado || 0,
+        FECHA_VALIDACION: item.fecha_validacion,
+
+        FECHA_LLAMADA: item.fecha_llamada,
+        AUDIO_URL: item.audio_url,
+        COMENTARIOS: item.comentarios
+      }));
+
+      setAllData(formattedData);
+    } else {
+      console.error('❌ Error en respuesta API:', result);
+    }
   } catch (error) {
-    console.error("❌ Error al cargar los datos del Excel:", error);
+    console.error("❌ Error al cargar los datos desde BigQuery:", error);
   } finally {
     setLoading(false);
   }

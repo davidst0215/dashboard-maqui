@@ -16,8 +16,12 @@ export function SummaryTable({ data }) {
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DNI</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conformidad</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gestor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendedor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado Val2</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntuación Total</th>
                 </tr>
               </thead>
@@ -25,13 +29,47 @@ export function SummaryTable({ data }) {
                 {data && data.length > 0 ? data.map((item, index) => (
                   <tr key={item.ID_LLAMADA || index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.DNI}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.CONFORMIDAD}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.CATEGORÍA}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.PUNTUACION_TOTAL}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.NOMBRE}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        item.CONFORMIDAD === 'Conforme'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {item.CONFORMIDAD}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        item.CATEGORÍA === 'BUENA'
+                          ? 'bg-green-100 text-green-800'
+                          : item.CATEGORÍA === 'MEDIA'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {item.CATEGORÍA}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.SUBGERENTE || 'No asignado'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.VENDEDOR || 'No asignado'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        item.RESULTADO_VAL2?.includes('SI CONFORME')
+                          ? 'bg-green-100 text-green-800'
+                          : item.RESULTADO_VAL2?.includes('NO CONFORME')
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {item.RESULTADO_VAL2 || 'Sin validación'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.PUNTUACION_TOTAL ? Number(item.PUNTUACION_TOTAL).toFixed(1) : 'N/A'}
+                    </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No hay datos para mostrar con los filtros actuales.</td>
+                    <td colSpan="8" className="px-6 py-4 text-center text-gray-500">No hay datos para mostrar con los filtros actuales.</td>
                   </tr>
                 )}
               </tbody>
