@@ -27,7 +27,7 @@ function DashboardView() {
     dni: ''
   });
 
-  const BACKEND_URL = 'https://dashboard-backend-207940673707.europe-west1.run.app';
+  const BACKEND_URL = 'https://maqui-dashboard-backend-207940673707.europe-west1.run.app';
   
   const fetchData = async () => {
   try {
