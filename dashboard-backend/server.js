@@ -7,7 +7,7 @@ const { Storage } = require('@google-cloud/storage');
 const { BigQuery } = require('@google-cloud/bigquery');
 
 const app = express();
-const PORT = process.env.PORT || 3009;
+const PORT = process.env.PORT || 8080;
 
 // Configuración
 const JWT_SECRET = process.env.JWT_SECRET || 'tu-clave-super-secreta-cambiar-en-produccion';
@@ -69,6 +69,7 @@ try {
 } catch (error) {
   console.error('❌ Error inicializando BigQuery:', error);
 }
+
 
 // Base de datos de usuarios (temporal)
 const USUARIOS = {
