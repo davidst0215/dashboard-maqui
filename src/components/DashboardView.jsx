@@ -1,7 +1,6 @@
 // src/components/DashboardView.jsx - Con datos Cloud
 import { useState } from 'react';
 import { useProcessedDashboard } from '../hooks/useDashboardCloud';
-import { useAuth } from './auth/LoginComponent';
 
 import { KpiCards } from './dashboard/KpiCards';
 import { DashboardFilters } from './dashboard/DashboardFilters';
@@ -53,7 +52,6 @@ function DashboardView({ cloudData, refreshData }) {
     dniResults
   } = useProcessedDashboard(cloudData, filters);
 
-  const { user, logout } = useAuth();
   
   console.log('📊 Datos Cloud recibidos:', cloudData?.length || 0, 'registros');
 
@@ -76,19 +74,8 @@ function DashboardView({ cloudData, refreshData }) {
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2 bg-slate-600/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-500/30">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span className="text-slate-300 text-sm font-medium">{user?.name || user?.email}</span>
+                <span className="text-slate-300 text-sm font-medium">Dashboard Público</span>
               </div>
-              <span className="text-slate-400 text-sm">{user?.role}</span>
-              <button
-                onClick={logout}
-                className="bg-red-600/80 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center space-x-1"
-                title="Cerrar Sesión"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Salir</span>
-              </button>
             </div>
           </div>
         </div>
