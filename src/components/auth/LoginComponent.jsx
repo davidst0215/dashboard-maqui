@@ -1,8 +1,9 @@
 // src/components/auth/LoginComponent.jsx
 import React, { useState, createContext, useContext, useEffect } from 'react';
+// 🔗 Importar configuración de API
+import { API_CONFIG } from '../../config/api.js';
 
-// 🔗 Configuración del backend (cambia aquí cuando quieras nueva URL)
-const BACKEND_URL = 'https://quality-dashboard-api-919351372784.europe-west1.run.app';
+const BACKEND_URL = API_CONFIG.BASE_URL;
 
 
 console.log('🔗 Backend URL configurada:', BACKEND_URL);
@@ -103,6 +104,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('auth_token', data.access_token);
         setToken(data.access_token);
         setUser(data.user);
+        console.log('🔄 Usuario actualizado, isAuthenticated debería ser:', !!data.user);
         return { success: true };
       } else {
         console.log('❌ Login fallido:', data.message);
@@ -237,7 +239,7 @@ export const LoginComponent = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="usuario@empresa.com"
+                placeholder="usuario@maquimas.pe"
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 transition duration-200"

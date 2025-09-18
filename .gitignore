@@ -24,3 +24,17 @@ dist-ssr
 *.sw?
 
 .vercel
+.env*.local
+
+# Google Cloud credentials
+*-credentials.json
+*-credentials-*.json
+service-key.json
+peak-emitter-*.json
+
+# Temporary files
+temp_*.txt
+formatted_*.txt
+
+# Claude AI
+.claude/

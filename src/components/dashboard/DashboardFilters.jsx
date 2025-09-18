@@ -12,7 +12,7 @@ export function DashboardFilters({ filters, onFilterChange, uniqueValues }) {
         <CardTitle>Filtros de Búsqueda</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="space-y-2">
             <Label>Período de gestión</Label>
             <Select value={filters.period} onValueChange={handleSelectChange('period')}>
@@ -40,6 +40,16 @@ export function DashboardFilters({ filters, onFilterChange, uniqueValues }) {
               <SelectContent>
                 <SelectItem value="">Todos</SelectItem>
                 {uniqueValues.subgerentes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Gerencia</Label>
+            <Select value={filters.gerencia} onValueChange={handleSelectChange('gerencia')}>
+              <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos</SelectItem>
+                {uniqueValues.gerencias.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>

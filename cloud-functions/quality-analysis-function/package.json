@@ -1,0 +1,17 @@
+{
+  "name": "quality-analysis-function",
+  "version": "1.0.0",
+  "description": "Cloud Function for AI-powered quality analysis",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "gcloud functions deploy analyzeQuality --trigger-http --runtime=nodejs18 --memory=1GB --timeout=540s --allow-unauthenticated"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^7.8.0",
+    "@google-cloud/vertexai": "^1.8.0"
+  },
+  "engines": {
+    "node": "18"
+  }
+}

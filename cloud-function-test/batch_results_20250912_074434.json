@@ -1,0 +1,122 @@
+[
+  {
+    "dni": "729143",
+    "filename": "22052025-21_10_49_992241928_000729143_000729143_(fd3ccb19-ea4e-4391-aaed-b54784a85047).wav",
+    "categoria": "MEDIA",
+    "puntuacion": 60,
+    "conformidad": "No Conforme",
+    "duracion_audio": 94.199936,
+    "confianza": 0.994426,
+    "costo": 0.01583999466666667,
+    "tiempo_proceso": 8.270151376724243,
+    "status": "success"
+  },
+  {
+    "dni": "887881",
+    "filename": "27092024-11_21_42_999999135_000887881_000887881-d451af23-bab8-4b09-a9b4-233db47c3e1b.wav",
+    "categoria": "MEDIA",
+    "puntuacion": 60,
+    "conformidad": "Conforme",
+    "duracion_audio": 96.199936,
+    "confianza": 0.993729,
+    "costo": 0.016031661333333336,
+    "tiempo_proceso": 4.538217067718506,
+    "status": "success"
+  },
+  {
+    "dni": "100001",
+    "filename": "21032025-16_35_39_988537286_00100001_00100001_(bf292fc0-0d40-4b5a-a696-e0dd8928129f).wav",
+    "categoria": "BUENA",
+    "puntuacion": 80,
+    "conformidad": "Conforme",
+    "duracion_audio": 222.31993,
+    "confianza": 0.98912966,
+    "costo": 0.028296660833333334,
+    "tiempo_proceso": 5.344315528869629,
+    "status": "success"
+  },
+  {
+    "dni": "1057810",
+    "filename": "31052025-19_03_41_900355893_001057810_001057810_(604af57b-301e-40e4-9481-9adac123d517).wav",
+    "categoria": "MEDIA",
+    "puntuacion": 60,
+    "conformidad": "No Conforme",
+    "duracion_audio": 114.55994,
+    "confianza": 0.95623815,
+    "costo": 0.018081661666666665,
+    "tiempo_proceso": 4.362584114074707,
+    "status": "success"
+  },
+  {
+    "dni": "1150311",
+    "filename": "30042025-23_03_40_992241928_001150311_001150311_(c2e40eb8-92f4-43a9-88a0-2f413e60b6bb).wav",
+    "categoria": "MUY BUENA",
+    "puntuacion": 100,
+    "conformidad": "Conforme",
+    "duracion_audio": 164.11993,
+    "confianza": 0.9976369,
+    "costo": 0.022701660833333335,
+    "tiempo_proceso": 4.525080442428589,
+    "status": "success"
+  },
+  {
+    "dni": "117921",
+    "filename": "11082025-17_35_20_929668393_00117921_00117921_(1dea2956-f6a5-42fa-9b10-e769d6067b2b).wav",
+    "categoria": "BUENA",
+    "puntuacion": 80,
+    "conformidad": "Conforme",
+    "duracion_audio": 630.75995,
+    "confianza": 0.9661443,
+    "costo": 0.07133332916666667,
+    "tiempo_proceso": 15.003004789352417,
+    "status": "success"
+  },
+  {
+    "dni": "126939",
+    "filename": "22022025-14_11_18_952287405_00126939_00126939_(6e599cc9-17bc-47b1-8eeb-ded345b2e4b1).wav",
+    "categoria": "MALA",
+    "puntuacion": 40,
+    "conformidad": "No Conforme",
+    "duracion_audio": 91.07994,
+    "confianza": 0.9970431,
+    "costo": 0.015124994999999999,
+    "tiempo_proceso": 3.901250123977661,
+    "status": "success"
+  },
+  {
+    "dni": "1373740",
+    "filename": "19082025-12_37_54_982149078_001373740_001373740_(d8124b2d-7b98-41be-8202-297550889b5f).wav",
+    "categoria": "MEDIA",
+    "puntuacion": 60,
+    "conformidad": "No Conforme",
+    "duracion_audio": 289.43994,
+    "confianza": 0.9963678,
+    "costo": 0.034734995,
+    "tiempo_proceso": 9.232642412185669,
+    "status": "success"
+  },
+  {
+    "dni": "1420718",
+    "filename": "25032025-17_31_36_921555431_001420718_001420718_(0a078132-e75c-4c71-90e1-df9baf5efdb8).wav",
+    "categoria": "MALA",
+    "puntuacion": 40,
+    "conformidad": "No Conforme",
+    "duracion_audio": 88.75994,
+    "confianza": 0.9604019,
+    "costo": 0.015841661666666666,
+    "tiempo_proceso": 5.125321388244629,
+    "status": "success"
+  },
+  {
+    "dni": "2017227",
+    "filename": "29102024-15_54_07_993705336_002017227_002017227-21dfb5c9-9b58-4099-abe9-44abb7b0f81c.wav",
+    "categoria": "MALA",
+    "puntuacion": 40,
+    "conformidad": "No Conforme",
+    "duracion_audio": 201.51994,
+    "confianza": 0.9375136,
+    "costo": 0.025478328333333335,
+    "tiempo_proceso": 3.814387559890747,
+    "status": "success"
+  }
+]

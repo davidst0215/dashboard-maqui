@@ -68,7 +68,7 @@ export function ExportReport({ processedAllData, uniqueValues }) {
     
     let reportLevel = "General";
     let reportName = "Todos los Equipos";
-    if (filters.advisor) { reportLevel = "Vendedor"; reportName = filters.advisor; }
+    if (filters.advisor) { reportLevel = "Asesor de Venta"; reportName = filters.advisor; }
     else if (filters.supervisor) { reportLevel = "Supervisor"; reportName = filters.supervisor; }
     else if (filters.submanager) { reportLevel = "Subgerente"; reportName = filters.submanager; }
 
@@ -135,7 +135,7 @@ export function ExportReport({ processedAllData, uniqueValues }) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Vendedor</Label>
+            <Label>Asesor de Venta</Label>
             <Select value={filters.advisor} onValueChange={handleFilterChange('advisor')}>
               <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
               <SelectContent>

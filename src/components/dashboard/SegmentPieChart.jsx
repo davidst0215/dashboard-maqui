@@ -2,7 +2,13 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const COLORS = { 'Excelente': '#1e3a8a', 'Alto': '#2563eb', 'Medio': '#3b82f6', 'Bajo': '#60a5fa', 'Muy bajo': '#93c5fd' };
+const COLORS = { 
+  'Muy Buena': '#10b981',   // Verde esmeralda - para la mejor categoría
+  'Buena': '#3b82f6',       // Azul - para buena calidad
+  'Media': '#f59e0b',       // Amarillo - para calidad media
+  'Mala': '#ef4444',        // Rojo - para mala calidad
+  'Pendiente': '#6b7280'    // Gris - para casos pendientes
+};
 
 export function SegmentPieChart({ data }) {
   const chartData = Object.entries(data)
