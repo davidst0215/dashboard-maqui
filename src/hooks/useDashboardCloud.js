@@ -29,13 +29,13 @@ export function useDashboardCloud() {
       console.log('⏰ Timestamp:', new Date().toISOString());
       setLoading(true);
       setError(null);
-      
+
       // Obtener token de auth
       const token = localStorage.getItem('auth_token');
       console.log('🔑🔑🔑 Token encontrado:', token ? 'SÍ' : 'NO');
       console.log('🔑 Token length:', token?.length || 0);
       console.log('🔑 Token preview:', token?.substring(0, 20) + '...' || 'NULL');
-      
+
       if (!token) {
         console.log('❌❌❌ NO HAY TOKEN - Abortando carga');
         throw new Error('No authenticated');
@@ -44,7 +44,7 @@ export function useDashboardCloud() {
       console.log('🌐🌐🌐 Haciendo fetch a BigQuery API...');
       const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD_DATA, { dias: 90 });
       console.log('🎯 URL:', apiUrl);
-      
+
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -99,6 +99,94 @@ export function useDashboardCloud() {
   // Función para refrescar datos manualmente
   const refreshData = () => {
     loadCloudData();
+  };
+
+  return {
+    data,
+    loading,
+    error,
+    performance,
+    refreshData
+  };
+}
+
+// Hook público para cargar datos sin autenticación
+export function useDashboardPublic() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [performance, setPerformance] = useState(null);
+
+  // Cargar datos desde la API pública
+  useEffect(() => {
+    console.log('🌍 USEEFFECT EJECUTÁNDOSE - useDashboardPublic (sin auth)');
+    loadPublicData();
+  }, []);
+
+  const loadPublicData = async () => {
+    try {
+      console.log('🔄🔄🔄 INICIANDO loadPublicData (sin autenticación)...');
+      console.log('⏰ Timestamp:', new Date().toISOString());
+      setLoading(true);
+      setError(null);
+
+      console.log('🌐🌐🌐 Haciendo fetch a API pública...');
+      const apiUrl = buildApiUrl('/api/dashboard/public', { dias: 90 });
+      console.log('🎯 URL pública:', apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('📡📡📡 Response status (público):', response.status);
+      console.log('📡 Response ok:', response.ok);
+      console.log('📡 Response statusText:', response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌❌❌ Response error text:', errorText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      console.log('🔍🔍🔍 RESPUESTA COMPLETA DEL BACKEND PÚBLICO:', result);
+      console.log('🔍 result.success:', result.success);
+      console.log('🔍 result.data type:', typeof result.data);
+      console.log('🔍 result.data length:', result.data?.length || 'NULL');
+      console.log('🔍 result.total:', result.total);
+      console.log('🔍 Primer registro:', result.data?.[0] || 'NULL');
+
+      if (!result.success) {
+        console.log('❌❌❌ Backend reportó error:', result.error);
+        throw new Error(result.error || 'Error desconocido');
+      }
+
+      console.log(`✅✅✅ Datos cargados exitosamente (público): ${result.total} registros`);
+      console.log(`📊 Fuente: ${result.source}`);
+      if (result.performance) {
+        console.log(`📈 Performance: ${result.performance.processed_from_analysis} procesados, ${result.performance.pending_analysis} pendientes`);
+      }
+
+      console.log('💾💾💾 Guardando datos en state...');
+      setData(result.data);
+      setPerformance(result.performance);
+      console.log('💾 State actualizado - data length:', result.data?.length);
+
+    } catch (err) {
+      console.error('❌ Error cargando datos públicos:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para refrescar datos manualmente
+  const refreshData = () => {
+    loadPublicData();
   };
 
   return {
