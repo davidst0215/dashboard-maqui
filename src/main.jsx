@@ -1,16 +1,29 @@
-// src/main.jsx - Dashboard público sin autenticación
+// src/main.jsx - Dashboard con autenticación requerida
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { AuthProvider, LoginComponent, useAuth } from './components/auth/LoginComponent'
 import DashboardView from './components/DashboardView'
-import { useDashboardPublic } from './hooks/useDashboardCloud'
+import { useDashboardCloud } from './hooks/useDashboardCloud'
 import './index.css'
 
-// Componente principal - dashboard público
+// Componente que maneja el login + dashboard
 function App() {
-  console.log('🏠🏠🏠 MAIN.JSX App renderizado - Modo Público');
+  const { isAuthenticated } = useAuth();
 
-  // Hook para datos de BigQuery público (sin autenticación)
-  const { data, loading, error, refreshData } = useDashboardPublic();
+  console.log('🏠🏠🏠 MAIN.JSX App renderizado - isAuthenticated:', isAuthenticated);
+
+  // Hook para datos de BigQuery (solo si está autenticado)
+  const { data, loading, error, refreshData } = useDashboardCloud();
+
+  console.log('📊📊📊 MAIN.JSX Hook useDashboardCloud resultado:');
+  console.log('  🔢 Data length:', data?.length || 'NULL/UNDEFINED');
+  console.log('  🔄 Loading:', loading);
+  console.log('  ❌ Error:', error || 'null');
+
+  // Si no está autenticado, mostrar login
+  if (!isAuthenticated) {
+    return <LoginComponent />;
+  }
 
   console.log('📊📊📊 MAIN.JSX Hook useDashboardPublic resultado:');
   console.log('  🔢 Data length:', data?.length || 'NULL/UNDEFINED');
@@ -82,9 +95,11 @@ function App() {
   );
 }
 
-// Renderizar sin AuthProvider (modo público)
+// Renderizar con AuthProvider (modo con autenticación)
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>,
 )
