@@ -1052,6 +1052,46 @@ app.get('/api/dashboard/data', verifyToken, async (req, res) => {
   }
 });
 
+// ========== ENDPOINT PÚBLICO SIN AUTENTICACIÓN ==========
+
+// Endpoint público para obtener datos del dashboard (sin autenticación)
+app.get('/api/dashboard/public', async (req, res) => {
+  try {
+    console.log('🌍 Consulta pública iniciada desde BigQuery...');
+
+    // Parámetros de filtrado
+    const { dias = 30 } = req.query;
+
+    // Consultar datos completos desde BigQuery (sin filtro de gerencia para público)
+    const datosCompletos = await consultarDatosBigQueryCompletos(parseInt(dias), null);
+
+    // Filtrar solo registros con DNI válido
+    const datosValidos = datosCompletos.filter(item => item.dni);
+
+    console.log(`✅ Consulta pública completada: ${datosValidos.length} registros`);
+
+    res.json({
+      success: true,
+      data: datosValidos,
+      total: datosValidos.length,
+      timestamp: new Date().toISOString(),
+      source: 'BigQuery Only (Público)',
+      performance: {
+        processed_from_analysis: datosCompletos.filter(item => item.categoria !== 'PENDIENTE').length,
+        pending_analysis: datosCompletos.filter(item => item.categoria === 'PENDIENTE').length
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error en endpoint público:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error obteniendo datos desde BigQuery',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // ========== ENDPOINT DE DATOS DE PRUEBA ==========
 
 // Endpoint temporal con datos de prueba mientras resolvemos las credenciales
