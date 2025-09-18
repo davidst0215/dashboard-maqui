@@ -153,7 +153,9 @@ app.use(cors({
       'http://localhost:5179',
       'http://localhost:5180',
       'http://localhost:5181',
-      'http://localhost:3000'
+      'http://localhost:3000',
+      'https://maqui-dashboard-imiecr288-david-sayainvestmes-projects.vercel.app',
+      'https://dashboard-maqui.vercel.app'
     ];
 
     // Permitir cualquier subdominio de vercel.app

@@ -42,8 +42,12 @@ export function useDashboardCloud() {
       }
 
       console.log('🌐🌐🌐 Haciendo fetch a BigQuery API...');
-      const apiUrl = buildApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD_DATA, { dias: 90 });
+      // TEMP: Usar datos demo en producción hasta resolver Cloud Run CORS
+      const isDev = API_CONFIG.BASE_URL.includes('localhost');
+      const endpoint = isDev ? API_CONFIG.ENDPOINTS.DASHBOARD_DATA : '/api/dashboard/demo';
+      const apiUrl = buildApiUrl(endpoint, { dias: 90 });
       console.log('🎯 URL:', apiUrl);
+      console.log('🔧 Modo:', isDev ? 'DEVELOPMENT (BigQuery)' : 'PRODUCTION (Demo data)');
       
       const response = await fetch(apiUrl, {
         method: 'GET',
