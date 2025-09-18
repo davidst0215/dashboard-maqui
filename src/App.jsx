@@ -1,22 +1,14 @@
-// src/App.jsx - Con integración Cloud (SIN EXCEL)
+// src/App.jsx - Dashboard público sin autenticación
 import React from 'react';
-import { AuthProvider, LoginComponent, useAuth } from './components/auth/LoginComponent';
 import DashboardView from './components/DashboardView';
-import { useDashboardCloud } from './hooks/useDashboardCloud';
+import { useDashboardPublic } from './hooks/useDashboardCloud';
 
-// Componente principal del dashboard con datos Cloud
+// Componente principal del dashboard público
 function DashboardApp() {
-  const { isAuthenticated } = useAuth();
-  console.log('🏠🏠🏠 DashboardApp renderizado - isAuthenticated:', isAuthenticated);
-  console.log('🔥🔥🔥 ESTE LOG DEBE APARECER SIEMPRE - DashboardApp ejecutándose');
-  
-  // Hook para datos de BigQuery (solo se ejecuta si está autenticado)
-  const { data, loading, error, refreshData } = useDashboardCloud();
-  
-  // Si no está autenticado, mostrar solo el login
-  if (!isAuthenticated) {
-    return <LoginComponent />;
-  }
+  console.log('🌍🌍🌍 DashboardApp renderizado - Modo Público');
+
+  // Hook para datos de BigQuery público (sin autenticación)
+  const { data, loading, error, refreshData } = useDashboardPublic();
   console.log('📊📊📊 Hook useDashboardCloud RESULTADO COMPLETO:');
   console.log('  🔢 Data length:', data?.length || 'NULL/UNDEFINED');
   console.log('  🔄 Loading:', loading);
@@ -93,13 +85,9 @@ function DashboardApp() {
   );
 }
 
-// App principal con el Provider
+// App principal sin autenticación
 function App() {
-  return (
-    <AuthProvider>
-      <DashboardApp />
-    </AuthProvider>
-  );
+  return <DashboardApp />;
 }
 
 export default App;
