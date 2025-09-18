@@ -73,8 +73,8 @@ try {
 
 // Base de datos de usuarios (temporal) - ACTUALIZADA CON GERENTES
 const USUARIOS = {
-  'admin@maquimas.pe': { 
-    password: 'password123', 
+  'admin@maquimas.pe': {
+    password: 'password123',
     role: 'admin',
     name: 'Administrador',
     gerencia: null  // Admin ve todo
@@ -142,7 +142,7 @@ app.use(cors({
   origin: function (origin, callback) {
     // Permitir requests sin origin (mobile apps, etc.)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:5174',
@@ -155,17 +155,17 @@ app.use(cors({
       'http://localhost:5181',
       'http://localhost:3000'
     ];
-    
+
     // Permitir cualquier subdominio de vercel.app
     if (origin.includes('.vercel.app')) {
       return callback(null, true);
     }
-    
+
     // Verificar origins específicos permitidos
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
+
     const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
     return callback(new Error(msg), false);
   },
@@ -207,8 +207,21 @@ app.use(express.static('.', {
     if (path.endsWith('.xlsx')) {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
-  }
+  },
+  // Excluir archivos .xlsx para que los maneje el endpoint específico
+  dotfiles: 'ignore',
+  index: false,
+  // Filtro para excluir .xlsx
+  extensions: false
 }));
+
+// Agregar middleware para excluir .xlsx
+app.use((req, res, next) => {
+  if (req.path.endsWith('.xlsx')) {
+    return next();
+  }
+  express.static('.')(req, res, next);
+});
 
 // Endpoint específico para el Excel (alternativa)
 app.get('/data.xlsx', async (req, res) => {
@@ -519,6 +532,116 @@ app.get('/api/audio/stream/*', async (req, res) => {
     if (!res.headersSent) {
       res.status(500).json({ error: 'Error interno: ' + error.message });
     }
+  }
+});
+
+// ========== ENDPOINTS DE DASHBOARD ==========
+
+// Endpoint para obtener datos del dashboard desde BigQuery
+app.get('/api/dashboard/data', verifyToken, async (req, res) => {
+  try {
+    console.log('📊 Cargando datos del dashboard desde BigQuery para usuario:', req.user.email);
+
+    if (!bigquery) {
+      return res.status(500).json({
+        success: false,
+        error: 'BigQuery no inicializado'
+      });
+    }
+
+    // Query mejorado con datos de Validacion_Ventas
+    const query = `
+      SELECT
+        a.dni,
+        a.categoria,
+        a.conformidad,
+        a.puntuacion_total,
+        a.puntuacion_identificacion,
+        a.puntuacion_verificacion,
+        a.puntuacion_contextualizacion,
+        a.puntuacion_consulta_dudas,
+        a.puntuacion_sentimientos,
+        a.comentarios,
+        a.fecha_llamada,
+        t.audio_url,
+
+        -- Datos enriquecidos de Validacion_Ventas
+        v.Nombre,
+        v.Gestor,
+        v.Vendedor,
+        v.Supervisor,
+        v.ResultadoVal1,
+        v.ResultadoVal2,
+        v.MontoCancelado,
+        DATE(v.FechaHoraConfirmacion) as fecha_validacion
+
+      FROM \`peak-emitter-350713.Calidad_Llamadas.analisis_calidad\` a
+      LEFT JOIN \`peak-emitter-350713.Calidad_Llamadas.transcripciones\` t
+        ON a.dni = t.dni AND DATE(a.fecha_llamada) = DATE(t.fecha_llamada)
+      LEFT JOIN \`peak-emitter-350713.FR_Admision.Validacion_Ventas\` v
+        ON LTRIM(v.NumeroDocumento, "0") = a.dni
+      WHERE DATE(a.fecha_llamada) >= '2025-09-01'
+        AND DATE(a.fecha_llamada) <= '2025-09-30'
+      ORDER BY a.fecha_llamada DESC
+    `;
+
+    console.log('🔍 Ejecutando query BigQuery...');
+    const [rows] = await bigquery.query({ query });
+
+    console.log(`✅ BigQuery respondió con ${rows.length} filas`);
+
+    if (rows.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        message: 'No se encontraron datos para el período consultado'
+      });
+    }
+
+    // Procesar datos para el frontend
+    const processedData = rows.map(row => ({
+      dni: row.dni,
+      categoria: row.categoria,
+      conformidad: row.conformidad,
+      puntuacion_total: row.puntuacion_total,
+      puntuacion_identificacion: row.puntuacion_identificacion,
+      puntuacion_verificacion: row.puntuacion_verificacion,
+      puntuacion_contextualizacion: row.puntuacion_contextualizacion,
+      puntuacion_consulta_dudas: row.puntuacion_consulta_dudas,
+      puntuacion_sentimientos: row.puntuacion_sentimientos,
+      comentarios: row.comentarios,
+      fecha_llamada: row.fecha_llamada,
+      audio_url: row.audio_url,
+
+      // Datos enriquecidos
+      Nombre: row.Nombre || 'No disponible',
+      Gestor: row.Gestor || 'No asignado',
+      Vendedor: row.Vendedor || 'No asignado',
+      Supervisor: row.Supervisor || 'No asignado',
+      ResultadoVal1: row.ResultadoVal1 || 'Sin validación',
+      ResultadoVal2: row.ResultadoVal2 || 'Sin validación',
+      MontoCancelado: row.MontoCancelado || 0,
+      fecha_validacion: row.fecha_validacion
+    }));
+
+    console.log('✅ Datos procesados exitosamente');
+    console.log(`📋 Primer registro de ejemplo:`, processedData[0]);
+
+    res.json({
+      success: true,
+      data: processedData,
+      total_records: processedData.length,
+      query_time: new Date().toISOString(),
+      user: req.user.email
+    });
+
+  } catch (error) {
+    console.error('❌ Error cargando datos del dashboard:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error cargando datos del dashboard',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
